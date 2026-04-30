@@ -80,7 +80,7 @@ def prompt_email() -> AnalyzerResponse:
         if email_body == "/exit":
             return AnalyzerResponse(EXIT_RETURN)
 
-    print("Analyzing email, please wait...")
+    print("\n\nAnalyzing email, please wait...")
 
     try:
         analysis: str = analyze_email(sender, sender_address, subject_line, email_body)
@@ -94,17 +94,18 @@ def display_analysis(analysis: str) -> bool:
     match: Match[str] | None = re.search(r"\{.*\}", analysis, re.DOTALL)
 
     if not match:
-        print("Something went wrong during analysis, please try again...")
+        print("\nSomething went wrong during analysis, please try again...\n")
         return False
 
     response_json = json.loads(match.group(0))
     analysis: str = response_json.get("analysis", "No analysis provided.")
     phishing_probability: float = response_json.get("phishing_probability", 0.0)
 
-    print("\n\n--- Analysis Result ---")
-    print(f"Analysis: {analysis}")
-    print(f"Phishing Probability: {phishing_probability:.2%}")
-    print("-----------------------\n\n")
+    print("\n\n========== Analysis Result ==========")
+    print(f"Analysis: {analysis}\n")
+    print(f"Phishing Probability: {phishing_probability:.0%}")
+    print("=====================================\n\n")
+
     return True
 
 
