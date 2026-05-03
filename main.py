@@ -6,11 +6,12 @@ import sys
 from requests import Response
 from re import Match
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "phishing-detector"
-SUCCESS_RETURN = 0
-EXIT_RETURN = 1
-ERROR_RETURN = 2
+OLLAMA_URL: str = "http://localhost:11434/api/generate"
+MODEL: str = "phishing-detector"
+DEBUG: bool = False
+SUCCESS_RETURN: int = 0
+EXIT_RETURN: int = 1
+ERROR_RETURN: int = 2
 
 
 class AnalyzerResponse:
@@ -21,7 +22,13 @@ class AnalyzerResponse:
 
 def ask_model(input_prompt: str) -> str:
     res: Response = requests.post(
-        url=OLLAMA_URL, json={"model": MODEL, "prompt": input_prompt, "stream": False}
+        url=OLLAMA_URL,
+        json={
+            "model": MODEL,
+            "prompt": input_prompt,
+            "stream": False,
+            "format": "json",
+        },
     )
 
     return res.json()["response"].strip()
@@ -91,6 +98,11 @@ def prompt_email() -> AnalyzerResponse:
 
 
 def display_analysis(analysis: str) -> bool:
+    if DEBUG:
+        print("\n\n========== Raw Analysis ==========")
+        print(analysis)
+        print("=====================================\n\n")
+
     match: Match[str] | None = re.search(r"\{.*\}", analysis, re.DOTALL)
 
     if not match:
@@ -98,18 +110,37 @@ def display_analysis(analysis: str) -> bool:
         return False
 
     response_json = json.loads(match.group(0))
+
     analysis: str = response_json.get("analysis", "No analysis provided.")
     phishing_probability: float = response_json.get("phishing_probability", 0.0)
+    urgency_level: str = response_json.get("urgency_level", "")
+    attack_type: str = response_json.get("attack_type", "")
+    recommended_action: str = response_json.get("recommended_action", "")
+    red_flags: list[str] = response_json.get("red_flags", [])
 
     print("\n\n========== Analysis Result ==========")
     print(f"Analysis: {analysis}\n")
     print(f"Phishing Probability: {phishing_probability:.0%}")
+
+    if urgency_level:
+        print(f"Urgency Level: {response_json.get('urgency_level', 'N/A')}")
+
+    if attack_type:
+        print(f"Attack Type: {response_json.get('attack_type', 'N/A')}")
+
+    if recommended_action:
+        print(f"Recommended Action: {response_json.get('recommended_action', 'N/A')}")
+
+    if red_flags:
+        print("Red Flags:")
+        for flag in red_flags:
+            print(f"\t- {flag}")
     print("=====================================\n\n")
 
     return True
 
 
-def main():
+def main() -> None:
     print("Welcome to the phishing detector!")
     print("Type /exit at any point to exit the program.")
 
