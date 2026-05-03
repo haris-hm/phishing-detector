@@ -29,7 +29,6 @@ You must respond ONLY with a valid JSON object matching this exact format:
 {
   "analysis": "Your detailed explanation here.",
   "phishing_probability": 0.85,
-  {
   "urgency_level": "High",
   "attack_type": "Credential Harvesting",
   "red_flags": [

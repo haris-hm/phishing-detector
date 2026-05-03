@@ -1,7 +1,7 @@
 [project]
 name = "phishing-detector"
 version = "0.1.0"
-description = "Add your description here"
+description = "A phishing detector which uses a local Ollama model in order to analyze inputted emails for potential threats. Created for the final assignment in Cybersecurity 140 at Drake University."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
